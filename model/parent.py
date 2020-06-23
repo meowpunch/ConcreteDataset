@@ -120,6 +120,8 @@ class BaseSearcher(GridSearchCV):
         err_ratio = (abs(self.error) / true) * 100
         # err_ratio.plot()
         plt.scatter(x=true, y=err_ratio)
+        plt.xlabel("y_true")
+        plt.ylabel("err_ratio = abs(y_true - y_pred) / y_true")
         plt.savefig("result/baseline/images/error_ratio.png")
 
         self.metric = self.scorer(y_true=y_true, y_pred=y_pred)
