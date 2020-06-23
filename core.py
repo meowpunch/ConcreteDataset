@@ -78,7 +78,8 @@ class BaselinePipeline:
         return metric
 
     @staticmethod
-    def load_dataset():
+    def load_dataset() -> pd.DataFrame:
+        # read DataFrame from xls file
         return pd.read_excel(
             'origin/Concrete_Data.xls',
             sheet_name='Sheet1'
@@ -86,11 +87,14 @@ class BaselinePipeline:
 
     def build_dataset(self):
         """
-            load dataset and split dataset
+            split Dataset
         :return: train Xy, test Xy
         """
-        # split
-        train, test = train_test_split(self.dataset, shuffle=True)
+        # split train test
+        # if you change random_state, u get a result slightly different from report
+        train, test = train_test_split(self.dataset, shuffle=True, random_state=0)
+
+        # split X y
         train_x, train_y = self.split_xy(train)
         test_x, test_y = self.split_xy(test)
 
