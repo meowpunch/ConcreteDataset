@@ -29,14 +29,14 @@ class ElasticNetModel(BaseModel):
             save tuned params, beta coef, metric, distribution, model
         :param prefix: dir
         """
-        self.save_coef(key="{prefix}/beta.pkl".format(prefix=prefix))
+        self.save_coef(key="{prefix}/beta.csv".format(prefix=prefix))
         self.save_metric(key="{prefix}/metric.pkl".format(prefix=prefix))
         self.save_error_distribution(prefix=prefix)
         self.save_model(key="{prefix}/model.pkl".format(prefix=prefix))
 
     def save_coef(self, key):
         self.logger.info("beta_coef:\n{coef}".format(coef=self.coef_df))
-        self.coef_df.to_csv("coef".format(key))
+        self.coef_df.to_csv(key, index=False)
 
 
 class ElasticNetSearcher(BaseSearcher):
@@ -72,7 +72,8 @@ class ElasticNetSearcher(BaseSearcher):
         return pd.Series(
             data=np.append(self.best_estimator_.coef_, self.best_estimator_.intercept_),
             index=self.x_train.columns.tolist() + ["intercept"],
-        ).rename("beta").reset_index().rename(columns={"index": "column"})
+            name="beta"
+        ).reset_index().rename(columns={"index": "column"})
 
     def save(self, prefix):
         """
@@ -90,4 +91,4 @@ class ElasticNetSearcher(BaseSearcher):
 
     def save_coef(self, key):
         self.logger.info("beta_coef:\n{coef}".format(coef=self.coef_df))
-        self.coef_df.to_csv(key)
+        self.coef_df.to_csv(key, index=False)

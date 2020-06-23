@@ -44,12 +44,6 @@ class BaseModel:
         self.y_true = pd.Series(y_true)
         self.x_true = x_true
 
-        plt.figure()
-        self.err_ratio = (abs(self.error) / self.y_true) * 100
-        # err_ratio.plot()
-        plt.scatter(x=self.y_true, y=self.err_ratio)
-        plt.show()
-
         self.metric = scorer(y_true=y_true, y_pred=y_pred)
         return self.metric
 
@@ -118,11 +112,13 @@ class BaseSearcher(GridSearchCV):
 
         plt.figure()
         err_ratio = (abs(self.error) / true) * 100
-        # err_ratio.plot()
+
         plt.scatter(x=true, y=err_ratio)
         plt.xlabel("y_true")
         plt.ylabel("err_ratio = abs(y_true - y_pred) / y_true")
+        plt.title("err_ratio by y_true")
         plt.savefig("result/baseline/images/error_ratio.png")
+        self.logger.info("mean of err_ratio: {v}".format(v=err_ratio.mean()))
 
         self.metric = self.scorer(y_true=y_true, y_pred=y_pred)
         return self.metric
