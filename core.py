@@ -1,14 +1,14 @@
-import numpy as np
 import pandas as pd
 from sklearn.metrics import mean_absolute_error
 from sklearn.model_selection import train_test_split
 
 from feature_extractor.core import FeatureExtractor
 from model.elastic_net import ElasticNetSearcher
+from model.gradient_boost import GradientBoostSearcher
 from utils.logger import init_logger
 
 
-class BaselinePipeline:
+class ConcretePipeline:
     def __init__(self, p_type):
         self.logger = init_logger()
         self.p_type = p_type
@@ -38,7 +38,7 @@ class BaselinePipeline:
         :return: exit code
         """
         try:
-            if self.p_type == "processed":
+            if self.p_type != "baseline":
                 processed = FeatureExtractor(
                     dataset=self.build_dataset()
                 ).transform()
@@ -67,16 +67,31 @@ class BaselinePipeline:
         x_train, y_train, x_test, y_test = dataset
 
         # train model
-        searcher = ElasticNetSearcher(
-            x_train=x_train, y_train=y_train,
-            columns = self.columns,
-            score=mean_absolute_error,
-            grid_params={
-                "max_iter": [1, 5, 10],
-                "alpha": [0, 0.0001, 0.001, 0.01, 0.1, 1, 10, 100],
-                "l1_ratio": np.arange(0.0, 1.0, 0.1)
-            }
-        )
+        if self.p_type != "advanced":
+            searcher = ElasticNetSearcher(
+                x_train=x_train, y_train=y_train,
+                columns=self.columns,
+                score=mean_absolute_error,
+                grid_params={
+                    "max_iter": [5, 10],  # [1, 5, 10],
+                    "alpha": [0, 10],  # [0, 0.0001, 0.001, 0.01, 0.1, 1, 10, 100],
+                    "l1_ratio": [0.0]  # np.arange(0.0, 1.0, 0.1)
+                }
+            )
+        else:
+            searcher = GradientBoostSearcher(
+                x_train=x_train, y_train=y_train,
+                columns=self.columns,
+                score=mean_absolute_error,
+                grid_params={
+                    'n_estimators': [200],  # [120, 150, 200],
+                    # 'learning_rate': [0.15],  # [0.15, 0.2],
+                    'max_depth': [10],  # [9, 10, 20],
+                    # 'min_samples_leaf': [6],  # [4, 5, 6],
+                    'max_features': [0.32],  # [0.28, 0.3, 0.32]
+                }
+            )
+
         searcher.fit()
 
         # estimate metrics

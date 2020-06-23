@@ -60,7 +60,7 @@ class ElasticNetSearcher(BaseSearcher):
         self.error = None  # pd.Series
         self.metric = None
 
-        super().__init__(x_train, y_train, grid_params, score, ElasticNet)
+        super().__init__(x_train, y_train, grid_params, score, ElasticNet())
 
     def fit(self, X=None, y=None, groups=None, **fit_params):
         super().fit(X=self.x_train, y=self.y_train)

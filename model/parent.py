@@ -82,7 +82,7 @@ class BaseSearcher(GridSearchCV):
     def __init__(
             self, x_train, y_train,
             grid_params=None, score=mean_squared_error,
-            estimator=ElasticNet
+            estimator=ElasticNet()
     ):
         if grid_params is None:
             raise ValueError("grid params are needed")
@@ -98,7 +98,7 @@ class BaseSearcher(GridSearchCV):
         self.logger = init_logger()
 
         super().__init__(
-            estimator=estimator(),
+            estimator=estimator,
             param_grid=grid_params,
             scoring=make_scorer(self.scorer, greater_is_better=False)
         )
