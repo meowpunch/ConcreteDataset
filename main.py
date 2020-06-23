@@ -1,6 +1,6 @@
 import sys
-import logging
 
+from core import BaselinePipeline
 from utils.logger import init_logger
 
 logger = init_logger()
@@ -8,7 +8,7 @@ logger = init_logger()
 
 def selector(key):
     return {
-        'baseline': None,
+        'baseline': BaselinePipeline,
         'advanced': None
     }[key]
 
@@ -18,7 +18,8 @@ def main(p_type):
     :return: exit code
     """
     try:
-        selector(key=p_type)
+        pipeline = selector(key=p_type)
+        pipeline().process()
     except KeyError:
         logger.error("please pass proper arguments, such as 'baseline'", exc_info=False)
 

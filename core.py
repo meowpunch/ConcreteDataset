@@ -1,5 +1,9 @@
+import numpy as np
 import pandas as pd
+from sklearn.metrics import mean_absolute_error
+from sklearn.model_selection import train_test_split
 
+from model.elastic_net import ElasticNetSearcher
 from utils.logger import init_logger
 
 
@@ -36,19 +40,61 @@ class BaselinePipeline:
 
     @property
     def columns(self):
+        # header of dataset
         return self.dataset.columns
 
     def data_pipeline(self):
         return self.load_dataset()
 
     def feature_extraction_pipeline(self):
-        return 1
+        return self.dataset
 
     def model_pipeline(self):
-        return 1
+        """
+            1. build dataset
+            2. train model ( + gridsearch)
+            3. estimate metrics
+        :return: metric
+        """
+        # build dataset
+        x_train, y_train, x_test, y_test = self.build_dataset()
 
-    def load_dataset(self):
+        # train model
+        searcher = ElasticNetSearcher(
+            x_train=x_train, y_train=y_train,
+            score=mean_absolute_error,
+            grid_params={
+                "max_iter": [1, 5, 10],
+                "alpha": [0, 0.0001, 0.001, 0.01, 0.1, 1, 10, 100],
+                "l1_ratio": np.arange(0.0, 1.0, 0.1)
+            }
+        )
+        searcher.fit()
+
+        # estimate metrics
+        pred_y = searcher.predict(X=x_test)
+        metric = searcher.estimate_metric(y_true=y_test, y_pred=pred_y)
+        searcher.save(prefix="result/baseline/")
+        return metric
+
+    @staticmethod
+    def load_dataset():
         return pd.read_excel(
             'origin/Concrete_Data.xls',
             sheet_name='Sheet1'
         )
+
+    def build_dataset(self):
+        """
+            load dataset and split dataset
+        :return: train Xy, test Xy
+        """
+        # split
+        train, test = train_test_split(self.dataset, shuffle=True)
+        train_x, train_y = self.split_xy(train)
+        test_x, test_y = self.split_xy(test)
+
+        return train_x, train_y, test_x, test_y
+
+    def split_xy(self, df: pd.DataFrame):
+        return df.drop(columns=self.columns[-1]), df[self.columns[-1]]
