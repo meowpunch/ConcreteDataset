@@ -8,7 +8,7 @@ from model.parent import BaseModel, BaseSearcher
 
 class ElasticNetModel(BaseModel):
     """
-        ElasticNet
+        tune ElasticNet
     """
 
     def __init__(self, x_train, y_train, params=None):
@@ -41,7 +41,7 @@ class ElasticNetModel(BaseModel):
 
 class ElasticNetSearcher(BaseSearcher):
     """
-        for research
+        for gridsearch
     """
 
     def __init__(self, x_train, y_train, grid_params=None, score=mean_absolute_error):
