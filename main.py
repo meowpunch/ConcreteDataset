@@ -1,4 +1,7 @@
 import sys
+import logging
+
+logger = logging.getLogger()
 
 
 def selector(key):
@@ -15,8 +18,7 @@ def main(p_type):
     try:
         selector(key=p_type)
     except KeyError:
-        print("please pass proper arguments, such as 'baseline'")
-        return False
+        logger.error("please pass proper arguments, such as 'baseline'", exc_info=False)
 
     return True
 
@@ -37,4 +39,4 @@ if __name__ == '__main__':
         process_type = sys.argv[1]
         main(p_type=process_type)
     except IndexError:
-        print("please pass process_type as argument")
+        logger.error(msg="please pass process_type as argument", exc_info=False)
