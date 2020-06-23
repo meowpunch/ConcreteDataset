@@ -3,6 +3,7 @@ import pandas as pd
 from sklearn.metrics import mean_absolute_error
 from sklearn.model_selection import train_test_split
 
+from feature_extractor.core import FeatureExtractor
 from model.elastic_net import ElasticNetSearcher
 from utils.logger import init_logger
 
@@ -11,18 +12,32 @@ class BaselinePipeline:
     def __init__(self):
         self.logger = init_logger()
 
+    @property
+    def dataset(self) -> pd.DataFrame:
+        """
+            1. load dataset
+            2. simplify column names
+        :return: Dataset
+        """
+        df = self.load_dataset()
+        columns = df.columns
+        return pd.concat(map(lambda col: df[col].rename(col.split(" "[0])), columns), axis=0)
+
+    @property
+    def columns(self):
+        # header of dataset
+        return self.dataset.columns
+
     def process(self):
         """
-            1. data_pipeline:
-                    load dataset
-            2. feature_extraction_pipeline: 
-                    extract features and preprocess data
-            3. model_pipeline: 
-                    train model and estimate metric
+            1. extract features and preprocess data
+            2.. train model and estimate metric
         :return: exit code
         """
         try:
-            processed = self.feature_extraction_pipeline()
+            processed = FeatureExtractor(
+                dataset=self.dataset
+            ).process()
             metric = self.model_pipeline()
         except ImportError as e:
             # TODO: handling ImportError
@@ -33,21 +48,6 @@ class BaselinePipeline:
             return False
 
         return True
-
-    @property
-    def dataset(self):
-        return self.data_pipeline()
-
-    @property
-    def columns(self):
-        # header of dataset
-        return self.dataset.columns
-
-    def data_pipeline(self):
-        return self.load_dataset()
-
-    def feature_extraction_pipeline(self):
-        return self.dataset
 
     def model_pipeline(self):
         """
