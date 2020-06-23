@@ -131,4 +131,6 @@ dmypy.json
 # Pycharm
 .idea
 
-result/
+*.csv
+*.pkl
+*.png

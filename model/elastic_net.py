@@ -82,7 +82,7 @@ class ElasticNetSearcher(BaseSearcher):
         self.save_params(key="{prefix}/params.pkl".format(prefix=prefix))
         self.save_coef(key="{prefix}/beta.csv".format(prefix=prefix))
         self.save_metric(key="{prefix}/metric.pkl".format(prefix=prefix))
-        self.save_error_distribution(prefix=prefix)
+        self.save_error_distribution(key="{prefix}/images/error_distribution.png".format(prefix=prefix))
         self.save_model(key="{prefix}/model.pkl".format(prefix=prefix))
 
     def save_params(self, key):

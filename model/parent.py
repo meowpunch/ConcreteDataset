@@ -82,8 +82,7 @@ class BaseModel:
 
 class BaseSearcher(GridSearchCV):
     """
-        BaseSearcher for ElasticNetSearcher, MLPRegressorSearcher
-        TODO: ENETSearcher and MLPSearcher inherit this class
+        BaseSearcher for ElasticNetSearcher
     """
 
     def __init__(
@@ -100,9 +99,6 @@ class BaseSearcher(GridSearchCV):
 
         self.error = None  # pd.Series
         self.metric = None
-
-        # s3
-        self.s3_manager = None
 
         # logger
         self.logger = init_logger()
@@ -124,7 +120,7 @@ class BaseSearcher(GridSearchCV):
         err_ratio = (abs(self.error) / true) * 100
         # err_ratio.plot()
         plt.scatter(x=true, y=err_ratio)
-        plt.show()
+        plt.savefig("result/baseline/images/error_ratio.png")
 
         self.metric = self.scorer(y_true=y_true, y_pred=y_pred)
         return self.metric
@@ -136,10 +132,10 @@ class BaseSearcher(GridSearchCV):
             # TODO: save to s3
         :param prefix: pr
         """
-        self.save_params(key="best_params.pkl".format(prefix=prefix))
-        self.save_metric(key="metric.pkl".format(prefix=prefix))
-        self.save_error_distribution(prefix=prefix)
-        self.save_model(key="model.pkl".format(prefix=prefix))
+        self.save_params(key="{prefix}/best_params.pkl".format(prefix=prefix))
+        self.save_metric(key="{prefix}/metric.pkl".format(prefix=prefix))
+        self.save_error_distribution(key="{prefix}/images/error_distribution.png".format(prefix=prefix))
+        self.save_model(key="{prefix}/model.pkl".format(prefix=prefix))
 
     def save_params(self, key):
         self.logger.info("tuned params: {params}".format(params=self.best_params_))
@@ -152,5 +148,6 @@ class BaseSearcher(GridSearchCV):
         # save best elastic net
         dump(self.best_estimator_, key)
 
-    def save_error_distribution(self, prefix):
+    def save_error_distribution(self, key):
         draw_hist(self.error)
+        plt.savefig(key)

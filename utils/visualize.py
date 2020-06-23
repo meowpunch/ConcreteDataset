@@ -7,20 +7,6 @@ import seaborn as sns
 from utils.logger import init_logger
 
 
-def plot(data: list):
-    print("in plot, the number of data set ", len(data))
-    data_len = len(data)
-    if data_len is 1:
-        plt.hist(data[0], density=True)
-
-    else:
-        fig, ax = plt.subplots(data_len, sharex='True')
-        for idx, arr in enumerate(data):
-            ax[idx].hist(arr, density=True)
-
-    plt.show()
-
-
 def draw_hist(s, h_type: str = "dist", name: str = None):
     plt.figure()
     h_method = {
@@ -37,7 +23,7 @@ def draw_hist(s, h_type: str = "dist", name: str = None):
     if isinstance(s, pd.Series):
         plt.title('{name} histogram'.format(name=s.name))
         method(s)
-        plt.show()
+        # plt.show()
     else:
         # for jupyter notebook
         plt.title('{name} histogram'.format(name=name))
