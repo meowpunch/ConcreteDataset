@@ -9,6 +9,7 @@ logger = init_logger()
 def selector(key):
     return {
         'baseline': BaselinePipeline,
+        'processed': BaselinePipeline,
         'advanced': None
     }[key]
 
@@ -19,7 +20,7 @@ def main(p_type):
     """
     try:
         pipeline = selector(key=p_type)
-        pipeline().process()
+        pipeline(p_type=p_type).process()
     except KeyError:
         logger.error("please pass proper arguments, such as 'baseline'", exc_info=False)
 
@@ -35,6 +36,10 @@ if __name__ == '__main__':
         p_type: 
             'baseline': 
                 Linear - ElasticNet
+                No Feature Extraction
+            'processed':
+                Linear - ElasticNet
+                + Feature Extraction
             'advanced':
                 
     """

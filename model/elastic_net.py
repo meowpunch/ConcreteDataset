@@ -44,7 +44,7 @@ class ElasticNetSearcher(BaseSearcher):
         for gridsearch
     """
 
-    def __init__(self, x_train, y_train, grid_params=None, score=mean_absolute_error):
+    def __init__(self, x_train, y_train, columns, grid_params=None, score=mean_absolute_error):
         if grid_params is None:
             grid_params = {
                 "max_iter": [1, 5, 10],
@@ -54,6 +54,7 @@ class ElasticNetSearcher(BaseSearcher):
 
         self.x_train = x_train
         self.y_train = y_train
+        self.columns = columns
         self.scorer = score
 
         self.error = None  # pd.Series
@@ -71,7 +72,7 @@ class ElasticNetSearcher(BaseSearcher):
         """
         return pd.Series(
             data=np.append(self.best_estimator_.coef_, self.best_estimator_.intercept_),
-            index=self.x_train.columns.tolist() + ["intercept"],
+            index=self.columns[:-1] + ["intercept"],
             name="beta"
         ).reset_index().rename(columns={"index": "column"})
 

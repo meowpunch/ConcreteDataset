@@ -9,8 +9,9 @@ from utils.logger import init_logger
 
 
 class BaselinePipeline:
-    def __init__(self):
+    def __init__(self, p_type):
         self.logger = init_logger()
+        self.p_type = p_type
 
     @property
     def dataset(self) -> pd.DataFrame:
@@ -21,24 +22,28 @@ class BaselinePipeline:
         """
         df = self.load_dataset()
         columns = df.columns
-        return pd.concat(map(lambda col: df[col].rename(col.split(" "[0])), columns), axis=0)
+        return pd.concat(map(lambda col: df[col].rename(col.split(" ")[0]), columns), axis=1)
 
     @property
-    def columns(self):
+    def columns(self) -> list:
         # header of dataset
-        return self.dataset.columns
+        return self.dataset.columns.to_list()
 
     def process(self):
         """
-            1. extract features and preprocess data
-            2.. train model and estimate metric
+            1. extract features
+            2. train model and estimate metric
         :return: exit code
         """
         try:
-            processed = FeatureExtractor(
-                dataset=self.dataset
-            ).process()
-            metric = self.model_pipeline()
+            if self.p_type == "processed":
+                processed = FeatureExtractor(
+                    dataset=self.build_dataset()
+                ).transform()
+            else:
+                processed = self.build_dataset()
+
+            metric = self.model_pipeline(dataset=processed)
         except ImportError as e:
             # TODO: handling ImportError
             self.logger.exception(e)
@@ -49,7 +54,7 @@ class BaselinePipeline:
 
         return True
 
-    def model_pipeline(self):
+    def model_pipeline(self, dataset):
         """
             1. build dataset
             2. train model ( + gridsearch)
@@ -57,11 +62,12 @@ class BaselinePipeline:
         :return: metric
         """
         # build dataset
-        x_train, y_train, x_test, y_test = self.build_dataset()
+        x_train, y_train, x_test, y_test = dataset
 
         # train model
         searcher = ElasticNetSearcher(
             x_train=x_train, y_train=y_train,
+            columns = self.columns,
             score=mean_absolute_error,
             grid_params={
                 "max_iter": [1, 5, 10],
@@ -74,7 +80,7 @@ class BaselinePipeline:
         # estimate metrics
         pred_y = searcher.predict(X=x_test)
         metric = searcher.estimate_metric(y_true=y_test, y_pred=pred_y)
-        searcher.save(prefix="result/baseline/")
+        searcher.save(prefix="result/{t}/".format(t=self.p_type))
         return metric
 
     @staticmethod
