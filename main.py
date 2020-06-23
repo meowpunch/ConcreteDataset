@@ -32,7 +32,11 @@ if __name__ == '__main__':
                 Linear - ElasticNet
                 + Feature Extraction
             'advanced':
+                Ensemble - GradientBoosting
+                + Feature Extraction
                 
+        ex) shell script (cmd on windows 10)
+            > python main.py advanced
     """
     try:
         process_type = sys.argv[1]

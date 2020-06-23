@@ -9,74 +9,9 @@ from utils.logger import init_logger
 from utils.visualize import draw_hist
 
 
-class BaseModel:
-    """
-        BaseModel for ElasticNetModel,
-    """
-
-    def __init__(self, x_train, y_train, params=None, estimator=ElasticNet):
-        # logger
-        self.logger = init_logger()
-
-        if params is None:
-            self.model = estimator()
-        else:
-            self.model = estimator(**params)
-
-        self.x_train, self.y_train = x_train, y_train
-
-        # result
-        self.x_true = None
-        self.y_true = None
-        self.pred = None
-        self.error = None
-        self.err_ratio = None
-        self.metric = None
-
-    def fit(self):
-        self.model.fit(self.x_train, self.y_train)
-
-    def predict(self, X):
-        return self.model.predict(X=X)
-
-    def estimate_metric(self, scorer, x_true, y_true, y_pred):
-        self.error = pd.Series(y_true - y_pred).rename("error")
-        self.y_true = pd.Series(y_true)
-        self.x_true = x_true
-
-        self.metric = scorer(y_true=y_true, y_pred=y_pred)
-        return self.metric
-
-    def score(self):
-        return self.model.score(self.x_train, self.y_train)
-
-    def save(self, prefix):
-        """
-            save beta coef, metric, distribution, model
-        :param prefix: dir
-        """
-        self.save_metric(key="metric.pkl".format(prefix=prefix))
-        self.save_error_distribution(prefix=prefix)
-        self.save_model(key="model.pkl".format(prefix=prefix))
-
-    def save_metric(self, key):
-        self.logger.info("metric is {metric}".format(metric=self.metric))
-        # self.s3_manager.save_dump(x=self.metric, key=key)
-
-    def save_model(self, key):
-        # self.s3_manager.save_dump(self.model, key=key)
-        pass
-
-    def save_error_distribution(self, prefix):
-        draw_hist(self.error)
-        # self.s3_manager.save_plt_to_png(
-        #     key="{prefix}/image/error_distribution.png".format(prefix=prefix)
-        # )
-
-
 class BaseSearcher(GridSearchCV):
     """
-        BaseSearcher for ElasticNetSearcher
+        BaseSearcher for ElasticNetSearcher & GradientBoostSearcher
     """
 
     def __init__(
