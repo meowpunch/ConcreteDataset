@@ -13,6 +13,8 @@ class BaselinePipeline:
         self.logger = init_logger()
         self.p_type = p_type
 
+        self.prefix = "result/{t}".format(t=self.p_type)
+
     @property
     def dataset(self) -> pd.DataFrame:
         """
@@ -79,8 +81,8 @@ class BaselinePipeline:
 
         # estimate metrics
         pred_y = searcher.predict(X=x_test)
-        metric = searcher.estimate_metric(y_true=y_test, y_pred=pred_y)
-        searcher.save(prefix="result/{t}/".format(t=self.p_type))
+        metric = searcher.estimate_metric(y_true=y_test, y_pred=pred_y, prefix=self.prefix)
+        searcher.save(prefix=self.prefix)
         return metric
 
     @staticmethod

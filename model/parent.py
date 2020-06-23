@@ -106,19 +106,11 @@ class BaseSearcher(GridSearchCV):
     def fit(self, X=None, y=None, groups=None, **fit_params):
         super().fit(X=self.x_train, y=self.y_train)
 
-    def estimate_metric(self, y_true, y_pred):
+    def estimate_metric(self, y_true, y_pred, prefix):
         self.error = pd.Series(y_true - y_pred).rename("error")
         true = pd.Series(y_true)
-
-        plt.figure()
-        err_ratio = (abs(self.error) / true) * 100
-
-        plt.scatter(x=true, y=err_ratio)
-        plt.xlabel("y_true")
-        plt.ylabel("err_ratio = abs(y_true - y_pred) / y_true")
-        plt.title("err_ratio by y_true")
-        plt.savefig("result/baseline/images/error_ratio.png")
-        self.logger.info("mean of err_ratio: {v}".format(v=err_ratio.mean()))
+        self.save_error_ratio(err_ratio=(abs(self.error) / true) * 100, true=true,
+                              key="{p}/images/error_ratio.png".format(p=prefix))
 
         self.metric = self.scorer(y_true=y_true, y_pred=y_pred)
         return self.metric
@@ -149,3 +141,13 @@ class BaseSearcher(GridSearchCV):
     def save_error_distribution(self, key):
         draw_hist(self.error)
         plt.savefig(key)
+
+    def save_error_ratio(self, err_ratio, true, key):
+        plt.figure()
+
+        plt.scatter(x=true, y=err_ratio)
+        plt.xlabel("y_true")
+        plt.ylabel("err_ratio = abs(y_true - y_pred) / y_true")
+        plt.title("err_ratio by y_true")
+        plt.savefig(key)
+        self.logger.info("mean of err_ratio: {v}".format(v=err_ratio.mean()))
