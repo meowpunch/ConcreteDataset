@@ -80,15 +80,14 @@ class ElasticNetSearcher(BaseSearcher):
         :param prefix: dir
         """
         self.save_params(key="{prefix}/params.pkl".format(prefix=prefix))
-        self.save_coef(key="{prefix}/beta.pkl".format(prefix=prefix))
+        self.save_coef(key="{prefix}/beta.csv".format(prefix=prefix))
         self.save_metric(key="{prefix}/metric.pkl".format(prefix=prefix))
         self.save_error_distribution(prefix=prefix)
         self.save_model(key="{prefix}/model.pkl".format(prefix=prefix))
 
     def save_params(self, key):
         self.logger.info("tuned params: {params}".format(params=self.best_params_))
-        # self.s3_manager.save_dump(x=self.best_params_, key=key)
 
     def save_coef(self, key):
         self.logger.info("beta_coef:\n{coef}".format(coef=self.coef_df))
-        self.coef_df.to_csv("coef".format(key))
+        self.coef_df.to_csv(key)
