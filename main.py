@@ -1,7 +1,9 @@
 import sys
 import logging
 
-logger = logging.getLogger()
+from utils.logger import init_logger
+
+logger = init_logger()
 
 
 def selector(key):
