@@ -1,9 +1,9 @@
 ##  [ConcreteDataset](https://archive.ics.uci.edu/ml/datasets/Concrete+Compressive+Strength)
+- origin/Concrete_Data.xls
 ###  Environment
-- Windows 10 
-- Pycharm Pro
+- Windows 10
 - Python 3.7
-- Anaconda
+- Anaconda (recommended)
 ###  Install Package
 You should install all package
 scikit-learn, numpy, pandas, xlrd, matplotlib, seaborn, joblib, PyYAML
