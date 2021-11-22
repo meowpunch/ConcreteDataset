@@ -1,6 +1,6 @@
 ##  [ConcreteDataset](https://archive.ics.uci.edu/ml/datasets/Concrete+Compressive+Strength)
 - data: `origin/Concrete_Data.xls`
-- analytics: `report.pdf`
+- analytics: [`report.pdf`](https://github.com/meowpunch/ConcreteDataset/blob/master/report.pdf)
 ###  Environment
 - Windows 10
 - Python 3.7
